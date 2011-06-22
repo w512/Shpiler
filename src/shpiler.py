@@ -16,9 +16,13 @@ class Cursor(cocos.layer.ColorLayer):
         self.m_s = 5            # step for move
         self.m_d = 0.01         # duration for move
 
-        self.sprite = cocos.sprite.Sprite('skynet.jpg')
+        self.sprite = cocos.sprite.Sprite('cursor.png')
         self.sprite.position = 320,40
         self.add(self.sprite)
+
+        print cocos.director.director.get_window_size()
+
+        
 
     def on_key_press(self, key, modifiers):
         """This function is called when a key is pressed."""
@@ -42,7 +46,7 @@ class Cursor(cocos.layer.ColorLayer):
         
 
 if __name__ == "__main__":
-    cocos.director.director.init()
+    cocos.director.director.init(caption='Shpiler')
     main_scene = cocos.scene.Scene(Cursor())
     cocos.director.director.run(main_scene)
 
