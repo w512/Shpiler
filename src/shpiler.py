@@ -1,5 +1,17 @@
-import sys
-import os
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+'''
+Shpiler - simple cool game
+'''
+
+__author__ = 'Nikolay Blohin (nikolay@blohin.org)'
+__version__ = '0.0.2'
+__copyright__ = 'Copyright (c) 2011 Nikolay Blohin'
+__license__ = 'GNU General Public License'
+
+# import sys
+# import os
+import random
 import pyglet
 import cocos
 from cocos.actions import *
@@ -10,7 +22,7 @@ class Cursor(cocos.layer.ColorLayer):
     is_event_handler = True
 
     def __init__(self):
-        super(Cursor, self).__init__(128, 224, 128, 255)
+        super(Cursor, self).__init__(250, 255, 250, 255)
         self.run_status = False # if false - stop, if true - run
         self.direction = 1      # 1 - North, 2 - East, 3 - South, 4 - West
         self.m_s = 3            # step for move
@@ -19,12 +31,20 @@ class Cursor(cocos.layer.ColorLayer):
         self.win_width, self.win_height = cocos.director.director.get_window_size()
 
         self.sprite = cocos.sprite.Sprite('cursor.png')
+        self.sprite_2 = cocos.sprite.Sprite('target.png')
         x = int(self.win_width/2)
         y = 8
         self.sprite.position = x, y
         self.add(self.sprite)
 
+        x = random.randrange(10, self.win_width-10)
+        y = random.randrange(30, self.win_height-10)
+        self.sprite_2.position = x, y
+        self.add(self.sprite_2)
+        
+
         self.schedule(self.update)
+        self.schedule_interval(self.move_target, 3)
         
 
     def on_key_press(self, key, modifiers):
@@ -47,6 +67,12 @@ class Cursor(cocos.layer.ColorLayer):
             self.direction = 3
         elif key==32:
             self.sprite.stop()
+
+    def move_target(self, *args, **kwargs):
+        x = random.randrange(10, self.win_width-10)
+        y = random.randrange(10, self.win_height-10)
+        self.sprite_2.do(MoveTo((x, y), duration=3.5))
+        print x, y
 
     def update(self, *args, **kwargs):
         x = self.sprite.x
