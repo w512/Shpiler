@@ -41,6 +41,8 @@ class Cursor(cocos.layer.ColorLayer):
 
         self.sprite = cocos.sprite.Sprite('cursor.png')
         self.sprite_2 = cocos.sprite.Sprite('target.png')
+        self.enemy = cocos.sprite.Sprite('sport_8ball.png')
+
         x = int(self.win_width/2)
         y = 8
         self.sprite.position = x, y
@@ -49,13 +51,19 @@ class Cursor(cocos.layer.ColorLayer):
         y = random.randrange(30, self.win_height-10)
         self.sprite_2.position = x, y
 
-        self.add(self.sprite)        
+        x = random.randrange(10, self.win_width-10)
+        y = random.randrange(10, self.win_height-10)
+        self.enemy.position = x, y
+
+        self.add(self.sprite)
         self.add(self.sprite_2)
+        self.add(self.enemy)
         self.add(self.label)
-        
+
         self.schedule(self.update)
         self.schedule_interval(self.move_target, 3)
-        
+        self.schedule_interval(self.move_enemy, 3)
+
 
     def on_key_press(self, key, modifiers):
         """This function is called when a key is pressed."""
@@ -83,6 +91,11 @@ class Cursor(cocos.layer.ColorLayer):
         y = random.randrange(10, self.win_height-10)
         self.sprite_2.do(MoveTo((x, y), duration=3.5))
 
+    def move_enemy(self, *args, **kwargs):
+        x = random.randrange(10, self.win_width-10)
+        y = random.randrange(10, self.win_height-10)
+        self.enemy.do(MoveTo((x, y), duration=3.5))
+
     def update(self, *args, **kwargs):
         x = self.sprite.x
         y = self.sprite.y
@@ -98,12 +111,19 @@ class Cursor(cocos.layer.ColorLayer):
 
         # check target
         x = self.sprite_2.x
-        y = self.sprite_2.y        
+        y = self.sprite_2.y
         if self.sprite.contains(x, y):
             self.score += 1
             self.label.element.text = 'Score: %s' % self.score
             self.move_target()
-        
+
+        x = self.enemy.x
+        y = self.enemy.y
+        if self.sprite.contains(x, y):
+            self.score -= 1
+            self.label.element.text = 'Score: %s' % self.score
+            self.move_enemy()
+
 
 if __name__=="__main__":
     cocos.director.director.init(caption='Shpiler')
