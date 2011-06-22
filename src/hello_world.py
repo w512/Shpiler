@@ -3,7 +3,12 @@ import os
 import pyglet
 import cocos
 from cocos.actions import *
-#sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+
+class Cursor():
+    def __init__(self):
+        self.run_status = False # if false - stop, if true - run
+        self.direction = 1      # 1 - North, 2 - East, 3 - South, 4 - West
 
 
 class HelloWorld(cocos.layer.ColorLayer):
