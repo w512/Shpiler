@@ -8,6 +8,7 @@ This is my experiments with a library Cocos2D.
 Requirements
 ------------
     * python
+    * virtualenv
 
 
 
