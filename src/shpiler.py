@@ -9,7 +9,7 @@ __version__ = '0.1.0'
 __copyright__ = 'Copyright (c) 2011 Nikolay Blohin'
 __license__ = 'GNU General Public License'
 
-
+import os
 import random
 import pyglet
 from pyglet.window import key as KEYS
@@ -20,7 +20,6 @@ from cocos.director import director
 
 SCORE_FOR_LEVEL = 5
 LEVEL = 1
-
 
 
 class Game(cocos.layer.ColorLayer):
@@ -55,8 +54,8 @@ class Game(cocos.layer.ColorLayer):
                           x=3,
                           y=self.win_height-62)
 
-        self.sprite_player = cocos.sprite.Sprite('cursor.png')
-        self.sprite_target = cocos.sprite.Sprite('target.png')
+        self.sprite_player = cocos.sprite.Sprite('resources/images/cursor.png')
+        self.sprite_target = cocos.sprite.Sprite('resources/images/target.png')
         x = int(self.win_width/2)
         y = 8
         self.sprite_player.position = x, y
@@ -129,6 +128,8 @@ class Game(cocos.layer.ColorLayer):
         if self.sprite_player.contains(x, y):
             self.score += 1
             self.label_score.element.text = 'Score: %s' % self.score
+            sound = pyglet.resource.media('resources/sounds/add_score.wav', streaming=False)
+            sound.play()
             if (self.score//SCORE_FOR_LEVEL)==len(self.attackers):
                 # curent level
                 self.sprite_target.stop()
@@ -146,7 +147,7 @@ class Game(cocos.layer.ColorLayer):
                 y = 8                
                 self.sprite_player.do(Place((x, y)))                
                 # add new attacker
-                temp_sprite = cocos.sprite.Sprite('sport_8ball.png')
+                temp_sprite = cocos.sprite.Sprite('resources/images/sport_8ball.png')
                 x = random.randrange(10, self.win_width-10)
                 y = random.randrange(30, self.win_height-10)                
                 temp_sprite.position = x, y
@@ -182,6 +183,8 @@ class NextLevel(cocos.layer.ColorLayer):
     def __init__(self):
         super(NextLevel, self).__init__(100, 200, 100, 255)
 
+        self.sound = pyglet.resource.media('resources/sounds/winning.wav', streaming=False)        
+
         win_width, win_height = cocos.director.director.get_window_size()
         global LEVEL
         text = 'Level %s' % LEVEL
@@ -205,6 +208,7 @@ class NextLevel(cocos.layer.ColorLayer):
     def on_enter(self):
         super(NextLevel,self).on_enter()
         self.label.element.text = 'Level: %s' % LEVEL
+        self.sound.play()        
 
     def on_key_press(self, key, modifiers):
         if key==KEYS.SPACE:
@@ -217,6 +221,8 @@ class Death(cocos.layer.ColorLayer):
 
     def __init__(self):
         super(Death, self).__init__(200, 100, 100, 255)
+
+        self.sound = pyglet.resource.media('resources/sounds/death.wav', streaming=False)
 
         win_width, win_height = cocos.director.director.get_window_size()
         self.label = cocos.text.Label('You killed :(',
@@ -236,16 +242,51 @@ class Death(cocos.layer.ColorLayer):
         self.add(self.label)
         self.add(self.label_2)
 
+    def on_enter(self):
+        super(Death,self).on_enter()
+        self.sound.play()        
         
     def on_key_press(self, key, modifiers):
         if key==KEYS.SPACE:
             director.pop()
-            
+
+
+class MainMenu(cocos.layer.ColorLayer):
+
+    is_event_handler = True    
+
+    def __init__(self):
+        super(MainMenu, self).__init__(50, 100, 50, 255)
+
+        #self.sound = pyglet.resource.media('resources/sounds/intro.wav', streaming=True)
+        win_width, win_height = cocos.director.director.get_window_size()
+        self.label = cocos.text.Label('Shpiler',
+                          font_size=60,
+                          color=(80, 0, 0, 255),
+                          x=win_width/2,
+                          y=win_height/2,
+                          anchor_x='center',
+                          anchor_y='center')
+        self.label_2 = cocos.text.Label('Press <spacebar> to continue',
+                          font_size=14,
+                          color=(80, 0, 0, 255),
+                          x=win_width/2,
+                          y=50,
+                          anchor_x='center',
+                          anchor_y='center')
+        self.add(self.label)
+        self.add(self.label_2)        
+
+    def on_key_press(self, key, modifiers):
+        if key==KEYS.SPACE:
+            director.push(main_scene)
+
 
 if __name__=="__main__":
     director.init(caption='Shpiler')
+    menu_scene = cocos.scene.Scene(MainMenu())
     main_scene = cocos.scene.Scene(Game())
     level_scene = cocos.scene.Scene(NextLevel())
     death_scene = cocos.scene.Scene(Death())
-    director.run(main_scene)
+    director.run(menu_scene)
 
